@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}SoulWeather - Poetic Chat{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="text-center space-y-4">
+        <h1
+            class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-soul-teal via-soul-blue to-soul-purple bg-clip-text text-transparent">
+            Poetic Conversations
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Share thoughts with your poetic companion who speaks in metaphors and verse
+        </p>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-teal-100 overflow-hidden">
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-slate-50/50 to-white/50">
+            {% if chat_messages %}
+            {% for message in chat_messages %}
+            {% if message.is_user %}
+            <!-- User Message -->
+            <div class="flex justify-end">
+                <div
+                    class="max-w-xs lg:max-w-md bg-gradient-to-r from-soul-blue to-soul-purple text-white rounded-2xl rounded-br-md px-4 py-3 shadow-lg">
+                    <div class="flex items-start space-x-2">
+                        <div class="flex-1">
+                            <p class="text-sm">{{ message.message }}</p>
+                            <p class="text-xs opacity-75 mt-1">{{ message.timestamp.strftime('%I:%M %p') }}</p>
+                        </div>
+                        <i class="ph ph-user-circle text-lg mt-1"></i>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- AI Message -->
+            <div class="flex justify-start">
+                <div
+                    class="max-w-xs lg:max-w-md bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-lg">
+                    <div class="flex items-start space-x-2">
+                        <i class="ph ph-sparkle text-lg text-soul-teal mt-1"></i>
+                        <div class="flex-1">
+                            <div class="prose prose-sm max-w-none text-gray-700 ai-message-content"
+                                data-markdown="{{ message.message }}">
+                                <!-- Markdown content will be rendered here -->
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">{{ message.timestamp.strftime('%I:%M %p') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <!-- Welcome Message -->
+            <div class="text-center py-8">
+                <div class="inline-block bg-white/80 rounded-2xl px-6 py-4 shadow-lg border border-teal-100">
+                    <i class="ph ph-chat-circle-dots text-3xl text-soul-teal mb-2"></i>
+                    <h3 class="font-semibold text-gray-700 mb-1">Welcome to Poetic Chat</h3>
+                    <p class="text-sm text-gray-600">Start a conversation and experience poetry in dialogue</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Chat Input -->
+        <div class="border-t border-gray-200 p-4 bg-white/90">
+            <form method="POST" class="flex space-x-3">
+                <div class="flex-1">
+                    <input type="text" name="message" placeholder="Share your thoughts, questions, or feelings..."
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-soul-teal focus:border-transparent text-gray-700 placeholder-gray-400"
+                        required autocomplete="off">
+                </div>
+                <button type="submit"
+                    class="bg-gradient-to-r from-soul-teal to-soul-blue text-white font-semibold px-6 py-3 rounded-lg hover:from-soul-blue hover:to-soul-teal transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="ph ph-paper-plane-tilt"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Chat Tips -->
+    <div class="bg-white/60 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <i class="ph ph-info text-soul-teal mr-2"></i>
+            Conversation Tips
+        </h3>
+        <div class="grid md:grid-cols-3 gap-4 text-sm">
+            <div class="flex items-start space-x-2">
+                <i class="ph ph-heart text-soul-rose mt-1"></i>
+                <div>
+                    <p class="font-medium text-gray-700">Express emotions</p>
+                    <p class="text-gray-600">Share what's in your heart</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-2">
+                <i class="ph ph-question text-soul-blue mt-1"></i>
+                <div>
+                    <p class="font-medium text-gray-700">Ask questions</p>
+                    <p class="text-gray-600">Seek wisdom and guidance</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-2">
+                <i class="ph ph-shooting-star text-soul-purple mt-1"></i>
+                <div>
+                    <p class="font-medium text-gray-700">Be creative</p>
+                    <p class="text-gray-600">Explore metaphors and imagery</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function scrollToBottom() {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        scrollToBottom();
+    });
+
+    document.querySelector('form').addEventListener('submit', function () {
+        setTimeout(scrollToBottom, 100);
+    });
+</script>
+{% endblock %}

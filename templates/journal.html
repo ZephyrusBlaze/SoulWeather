@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}SoulWeather - Your Emotional Journal{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="text-center space-y-4">
+        <h1
+            class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-soul-purple via-soul-blue to-soul-teal bg-clip-text text-transparent">
+            Your Emotional Journey
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Explore the patterns and poetry of your inner weather across time
+        </p>
+    </div>
+
+    <!-- Mood Trends Chart -->
+    {% if chart_data %}
+    <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-purple-100 p-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">
+            <i class="ph ph-chart-line text-soul-purple mr-2"></i>
+            Emotional Weather Patterns
+        </h2>
+        <div class="h-96">
+            <canvas id="moodChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mood Entries -->
+    <div class="space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800">
+            <i class="ph ph-book-open text-soul-blue mr-2"></i>
+            Your Weather History
+        </h2>
+
+        {% if mood_entries %}
+        <div class="grid gap-6">
+            {% for entry in mood_entries %}
+            <div
+                class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="ph ph-calendar text-soul-teal"></i>
+                        <span class="text-sm text-gray-500">{{ entry.timestamp.strftime('%B %d, %Y at %I:%M %p')
+                            }}</span>
+                    </div>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        {{ entry.weather_condition }}
+                    </span>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Original Mood -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-700 mb-2">
+                            <i class="ph ph-heart text-soul-rose mr-1"></i>
+                            Your Feelings
+                        </h4>
+                        <p class="text-gray-600 italic">"{{ entry.mood_text }}"</p>
+                    </div>
+
+                    <!-- Poetic Description -->
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-2">
+                            <i class="ph ph-feather text-soul-purple mr-1"></i>
+                            Poetic Reflection
+                        </h4>
+                        <div class="prose max-w-none text-gray-700 poetry-content"
+                            data-markdown="{{ entry.poetic_description }}">
+                            <!-- Markdown content will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Expandable Forecast and Activity -->
+                    <div class="border-t pt-4">
+                        <button onclick="toggleDetails({{ entry.id }})"
+                            class="flex items-center text-soul-blue hover:text-soul-purple transition-colors duration-200">
+                            <i class="ph ph-caret-right mr-1 transform transition-transform duration-200"
+                                id="arrow-{{ entry.id }}"></i>
+                            <span>View Forecast & Activity</span>
+                        </button>
+
+                        <div id="details-{{ entry.id }}" class="hidden mt-4 space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-teal-50 rounded-lg p-4">
+                                    <h5 class="font-semibold text-teal-800 mb-3">3-Day Forecast</h5>
+                                    {% if entry.forecast.day1 %}
+                                    <div class="space-y-2">
+                                        {% for day_key in ['day1', 'day2', 'day3'] %}
+                                        {% set day_data = entry.forecast[day_key] %}
+                                        <div class="flex items-center justify-between p-2 bg-white/60 rounded">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-lg">{{ day_data.emoji }}</span>
+                                                <div class="text-xs">
+                                                    <div class="font-medium text-teal-800">{{ day_data.day }}</div>
+                                                    <div class="text-teal-600">{{ day_data.condition[:20] }}...</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right text-xs">
+                                                <div class="font-bold text-teal-800">{{ day_data.temp_f }}°</div>
+                                                <div class="text-teal-600">{{ day_data.humidity }}%</div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <div class="prose prose-sm max-w-none text-teal-700 forecast-content"
+                                        data-markdown="{{ entry.forecast }}">
+                                        <!-- Fallback for old format -->
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="bg-rose-50 rounded-lg p-4">
+                                    <h5 class="font-semibold text-rose-800 mb-2">Suggested Activity</h5>
+                                    <p class="text-rose-700 text-sm">{{ entry.activity_suggestion }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <div class="bg-white/60 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-8">
+                <i class="ph ph-cloud-x text-6xl text-gray-400 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">No Weather Reports Yet</h3>
+                <p class="text-gray-500 mb-6">Start by sharing your emotions to begin your emotional weather journey.
+                </p>
+                <a href="{{ url_for('index') }}"
+                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-soul-blue to-soul-purple text-white font-semibold rounded-lg hover:from-soul-purple hover:to-soul-blue transition-all duration-300">
+                    <i class="ph ph-plus mr-2"></i>
+                    Create Your First Weather Report
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    {% if chart_data %}
+    const chartData = {{ chart_data | tojson | safe }};
+
+    const dates = chartData.map(item => item.date);
+    const moodLengths = chartData.map(item => item.mood_length);
+    const descriptionLengths = chartData.map(item => item.description_length);
+
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Expression Depth',
+                    data: moodLengths,
+                    borderColor: '#4F46E5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Poetic Richness',
+                    data: descriptionLengths,
+                    borderColor: '#7C3AED',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Text Length (characters)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    function toggleDetails(entryId) {
+        const details = document.getElementById(`details-${entryId}`);
+        const arrow = document.getElementById(`arrow-${entryId}`);
+
+        if (details.classList.contains('hidden')) {
+            details.classList.remove('hidden');
+            arrow.classList.add('rotate-90');
+        } else {
+            details.classList.add('hidden');
+            arrow.classList.remove('rotate-90');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}SoulWeather - Express Your Emotions{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Hero Section -->
+    <div class="text-center space-y-4">
+        <h1
+            class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-soul-blue via-soul-purple to-soul-teal bg-clip-text text-transparent">
+            How's Your Inner Weather?
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Share your emotions and discover the poetic weather patterns of your soul.
+            Transform feelings into beautiful metaphors.
+        </p>
+    </div>
+
+    <!-- Mood Input Form -->
+    <div class="max-w-2xl mx-auto">
+        <form method="POST" class="space-y-6">
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-purple-100 p-8">
+                <div class="space-y-4">
+                    <label for="mood_text" class="block text-lg font-semibold text-gray-700">
+                        <i class="ph ph-pencil-line text-soul-blue mr-2"></i>
+                        What's happening in your emotional landscape today?
+                    </label>
+                    <textarea name="mood_text" id="mood_text" rows="4"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-soul-blue focus:border-transparent resize-none text-gray-700 placeholder-gray-400"
+                        placeholder="Describe your current feelings, thoughts, or emotional state. Be as detailed or as brief as you'd like..."
+                        required>{{ mood_text if mood_text }}</textarea>
+
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-soul-blue to-soul-purple text-white font-semibold py-3 px-6 rounded-lg hover:from-soul-purple hover:to-soul-blue transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="ph ph-cloud-lightning mr-2"></i>
+                        Generate My Emotional Weather
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Weather Results -->
+    {% if weather_data %}
+    <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Weather Condition -->
+        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-blue-100 p-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                <i class="ph ph-cloud text-soul-blue mr-2"></i>
+                Current Emotional Weather
+            </h2>
+            {% if weather_data.forecast.day1 %}
+            <div class="flex items-center justify-center space-x-6 mb-4">
+                <div class="text-6xl weather-emoji">{{ weather_data.forecast.day1.emoji }}</div>
+                <div class="text-left">
+                    <div class="text-4xl font-bold text-gray-800 temperature">{{ weather_data.forecast.day1.temp_f }}°F
+                    </div>
+                    <div class="text-lg text-gray-500">{{ weather_data.forecast.day1.temp_c }}°C</div>
+                    <div class="text-sm text-blue-600 flex items-center mt-1 humidity">
+                        <i class="ph ph-drop mr-1"></i>{{ weather_data.forecast.day1.humidity }}% humidity
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <p
+                class="text-2xl font-semibold bg-gradient-to-r from-soul-blue to-soul-teal bg-clip-text text-transparent">
+                {{ weather_data.weather_condition }}
+            </p>
+        </div>
+
+        <!-- Poetic Description -->
+        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-purple-100 p-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="ph ph-scroll text-soul-purple mr-2"></i>
+                Poetic Reflection
+            </h3>
+            <div class="prose prose-lg max-w-none text-gray-700 poetry-content"
+                data-markdown="{{ weather_data.poetic_description }}">
+                <!-- Markdown content will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Forecast and Activity Grid -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- 3-Day Forecast -->
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-teal-100 p-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">
+                    <i class="ph ph-calendar text-soul-teal mr-2"></i>
+                    3-Day Emotional Forecast
+                </h3>
+                <div class="space-y-4">
+                    {% if weather_data.forecast.day1 %}
+                    {% for day_key in ['day1', 'day2', 'day3'] %}
+                    {% set day_data = weather_data.forecast[day_key] %}
+                    <div class="flex items-center justify-between p-4 forecast-card rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <div class="text-3xl weather-emoji">{{ day_data.emoji }}</div>
+                            <div>
+                                <div class="font-semibold text-gray-800">{{ day_data.day }}</div>
+                                <div class="text-sm text-gray-600">{{ day_data.condition }}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-gray-800 temperature">{{ day_data.temp_f }}°F</div>
+                            <div class="text-sm text-gray-500">{{ day_data.temp_c }}°C</div>
+                            <div class="text-xs text-blue-600 flex items-center humidity">
+                                <i class="ph ph-drop mr-1"></i>{{ day_data.humidity }}%
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="prose max-w-none text-gray-700 forecast-content"
+                        data-markdown="{{ weather_data.forecast }}">
+                        <!-- Fallback for old format -->
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Activity Suggestion -->
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-rose-100 p-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="ph ph-heart text-soul-rose mr-2"></i>
+                    Recommended Activity
+                </h3>
+                <div class="text-gray-700 activity-content">
+                    {{ weather_data.activity_suggestion }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Save to Journal Notice -->
+        <div class="text-center">
+            <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg">
+                <i class="ph ph-check-circle mr-2"></i>
+                Your emotional weather has been saved to your journal
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Getting Started Tips -->
+    {% if not weather_data %}
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white/60 backdrop-blur-md rounded-2xl shadow-lg border border-gray-100 p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                <i class="ph ph-lightbulb text-yellow-500 mr-2"></i>
+                Tips for Expressing Your Emotions
+            </h2>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="space-y-2">
+                    <i class="ph ph-heart-straight text-3xl text-soul-rose"></i>
+                    <h3 class="font-semibold text-gray-700">Be Honest</h3>
+                    <p class="text-sm text-gray-600">Share what you're truly feeling, without judgment</p>
+                </div>
+                <div class="space-y-2">
+                    <i class="ph ph-pencil-circle text-3xl text-soul-blue"></i>
+                    <h3 class="font-semibold text-gray-700">Be Descriptive</h3>
+                    <p class="text-sm text-gray-600">Use colors, sensations, or metaphors that resonate</p>
+                </div>
+                <div class="space-y-2">
+                    <i class="ph ph-clock text-3xl text-soul-teal"></i>
+                    <h3 class="font-semibold text-gray-700">This Moment</h3>
+                    <p class="text-sm text-gray-600">Focus on how you feel right now, today</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SoulWeather - Your Emotional Weather Report{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soul-blue': '#4F46E5',
+                        'soul-purple': '#7C3AED',
+                        'soul-teal': '#14B8A6',
+                        'soul-rose': '#F43F5E'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-lg border-b border-purple-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}"
+                        class="flex items-center space-x-2 text-2xl font-bold bg-gradient-to-r from-soul-blue to-soul-purple bg-clip-text text-transparent">
+                        <i class="ph ph-cloud-rain text-3xl text-soul-blue"></i>
+                        <span>SoulWeather</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="{{ url_for('index') }}"
+                        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:text-soul-blue hover:bg-blue-50 transition-all duration-300 {% if request.endpoint == 'index' %}bg-blue-100 text-soul-blue{% endif %}">
+                        <i class="ph ph-heart text-lg"></i>
+                        <span>Mood Check</span>
+                    </a>
+                    <a href="{{ url_for('journal') }}"
+                        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:text-soul-purple hover:bg-purple-50 transition-all duration-300 {% if request.endpoint == 'journal' %}bg-purple-100 text-soul-purple{% endif %}">
+                        <i class="ph ph-book text-lg"></i>
+                        <span>Journal</span>
+                    </a>
+                    <a href="{{ url_for('chat') }}"
+                        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:text-soul-teal hover:bg-teal-50 transition-all duration-300 {% if request.endpoint == 'chat' %}bg-teal-100 text-soul-teal{% endif %}">
+                        <i class="ph ph-chat-circle-dots text-lg"></i>
+                        <span>Poetic Chat</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% for category, message in messages %}
+        <div
+            class="alert alert-{{ category }} p-4 rounded-lg mb-4 {% if category == 'error' %}bg-red-100 border border-red-300 text-red-800{% else %}bg-green-100 border border-green-300 text-green-800{% endif %}">
+            <div class="flex items-center">
+                <i class="ph ph-info text-lg mr-2"></i>
+                <span>{{ message }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/50 backdrop-blur-md border-t border-purple-100 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="text-gray-600 text-sm">
+                    <i class="ph ph-heart-straight text-soul-rose mr-1"></i>
+                    SoulWeather - Where emotions meet poetry
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
